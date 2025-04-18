@@ -12,9 +12,10 @@ setattr(opts, "model.classification.mitv2.attn_dropout", 0.0)
 setattr(opts, "model.classification.mitv2.ffn_dropout", 0.0)
 setattr(opts, "model.classification.mitv2.attn_norm_layer", "layer_norm_2d")
 setattr(opts, "common.enable_coreml_compatible_module", False)
+setattr(opts, "model.classification.enable_layer_wise_lr_decay", False)
 
-# Add the missing attribute with a default value
-setattr(opts, "model.classification.enable_layer_wise_lr_decay", False) # <-- Add this line
+# Add the second missing attribute with a default value
+setattr(opts, "model.classification.layer_wise_lr_decay_rate", 0.9) # <-- Add this line
 
 # 2. Instantiate the model
 model = MobileViTv2(opts=opts)

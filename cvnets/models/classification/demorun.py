@@ -1,37 +1,42 @@
 import torch
 from cvnets.models.classification.mobilevit_v2 import MobileViTv2
-from types import SimpleNamespace
-import json
+# Import necessary components for argument parsing
+import argparse
+from options.opts import get_training_arguments # Assuming this function aggregates most common/training args
 
-# Define the configuration using nested dictionaries.
-# This structure matches the attributes accessed via 'getattr' in MobileViTv2 and its config.
-opts_dict = {
-    "model": {
-        "classification": {
-            # Accessed by MobileViTv2.__init__
-            "n_classes": 1000,
-            "mitv2": {
-                # Accessed by get_configuration
-                "width_multiplier": 1.0
-            }
-        },
-        "layer": {
-            # Accessed by MobileViTv2.__init__
-            "global_pool": 'mean'
-        }
-    }
-    # Add other keys if needed by base classes or specific layers
-}
+# 1. Create the main argument parser
+parser = argparse.ArgumentParser(description="MobileViTv2 Feature Extraction Demo")
 
-# Convert the nested dictionary to a SimpleNamespace object for attribute access (e.g., opts.model.layer.global_pool)
-opts = json.loads(json.dumps(opts_dict), object_hook=lambda d: SimpleNamespace(**d))
+# 2. Add arguments defined in the repository
+# Add general training arguments (which include many defaults needed by layers/models)
+parser = get_training_arguments(parser)
 
-# Instantiate the model using the created opts object
+# Add model-specific arguments for MobileViTv2
+parser = MobileViTv2.add_arguments(parser)
+
+# Add any other argument groups if needed by base classes or specific layers,
+# although get_training_arguments likely covers most common ones.
+# For example:
+# from cvnets.layers import ConvLayer2d
+# parser = ConvLayer2d.add_arguments(parser) # If ConvLayer2d defines specific args
+
+# 3. Parse arguments with an empty list to get defaults
+# Provide an empty list to parse_args to use default values
+opts = parser.parse_args([])
+
+# --- Optional: Set specific options if defaults aren't quite right ---
+# For example, if the default width multiplier needs changing for a specific variant:
+# opts.model.classification.mitv2.width_multiplier = 0.75
+# Or ensure necessary keys exist if not covered by defaults (less likely now)
+# if not hasattr(opts.model.classification, 'enable_layer_wise_lr_decay'):
+#     opts.model.classification.enable_layer_wise_lr_decay = False # Example fallback
+
+# 4. Instantiate the model using the parsed opts object
 model = MobileViTv2(opts=opts)
 model.eval() # Set the model to evaluation mode
 
 # Create a dummy input image
-img = torch.randn(1, 3, 256, 256)
+img = torch.randn(1, 3, 256, 256) # Assuming default input size, adjust if needed
 
 # Pass the image through the model to get feature maps
 feature_maps = model(img)

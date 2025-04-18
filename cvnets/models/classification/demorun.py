@@ -14,12 +14,15 @@ setattr(opts, "model.classification.mitv2.attn_norm_layer", "layer_norm_2d")
 setattr(opts, "common.enable_coreml_compatible_module", False)
 setattr(opts, "model.classification.enable_layer_wise_lr_decay", False)
 setattr(opts, "model.classification.layer_wise_lr_decay_rate", 0.9)
+setattr(opts, "model.normalization.name", "batch_norm")
+setattr(opts, "model.normalization.momentum", 0.1)
+setattr(opts, "model.normalization.groups", 1)
 
-# Add the missing normalization attribute
-setattr(opts, "model.normalization.name", "batch_norm") # <-- Add this line (e.g., 'batch_norm')
-# You might also need related normalization options depending on the chosen type
-setattr(opts, "model.normalization.momentum", 0.1) # Example for batch_norm
-setattr(opts, "model.normalization.groups", 1) # Example for group_norm/instance_norm
+# Add the missing activation attribute
+setattr(opts, "model.activation.name", "swish") # <-- Add this line (e.g., 'swish' or 'relu')
+# Add related activation options if needed
+setattr(opts, "model.activation.inplace", False) # Example default
+setattr(opts, "model.activation.neg_slope", 0.1) # Example for leaky relu
 
 # 2. Instantiate the model
 model = MobileViTv2(opts=opts)

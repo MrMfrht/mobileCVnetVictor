@@ -156,7 +156,7 @@ class TransformerEncoder(BaseModule):
         return x
 
 
-class dLinearAttnFFN(BaseModule):
+class LinearAttnFFN(BaseModule):
     """
     This class defines the pre-norm transformer encoder with linear self-attention in `MobileViTv2 <https://arxiv.org/abs/2206.02680>`_ paper
     Args:

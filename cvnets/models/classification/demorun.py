@@ -1,28 +1,45 @@
 import torch
 from cvnets.models.classification.mobilevit_v2 import MobileViTv2
-from cvnets.models.classification.config import mobilevit_v2
-from cvnets import utils
+from types import SimpleNamespace
+import json
 
-opts = utils.AttrDict()
-opts.model = utils.AttrDict()
-opts.model.classification = utils.AttrDict()
-opts.model.classification.n_classes = 1000 # doesn't matter since we are extracting feature maps
-opts.model.layer = utils.AttrDict()
-opts.model.layer.global_pool = 'mean'
+# Define the configuration using nested dictionaries.
+# This structure matches the attributes accessed via 'getattr' in MobileViTv2 and its config.
+opts_dict = {
+    "model": {
+        "classification": {
+            # Accessed by MobileViTv2.__init__
+            "n_classes": 1000,
+            "mitv2": {
+                # Accessed by get_configuration
+                "width_multiplier": 1.0
+            }
+        },
+        "layer": {
+            # Accessed by MobileViTv2.__init__
+            "global_pool": 'mean'
+        }
+    }
+    # Add other keys if needed by base classes or specific layers
+}
 
-# you can set the width multiplier in the config file
-# or you can pass it as an argument
-# opts.model.classification.mobilevitv2.width_multiplier = 1.0
+# Convert the nested dictionary to a SimpleNamespace object for attribute access (e.g., opts.model.layer.global_pool)
+opts = json.loads(json.dumps(opts_dict), object_hook=lambda d: SimpleNamespace(**d))
 
+# Instantiate the model using the created opts object
 model = MobileViTv2(opts=opts)
-model.eval() # set the model to evaluation mode
+model.eval() # Set the model to evaluation mode
 
-# create a dummy input image
+# Create a dummy input image
 img = torch.randn(1, 3, 256, 256)
 
-# pass the image through the model
+# Pass the image through the model to get feature maps
 feature_maps = model(img)
 
-# print the shape of each feature map
+# Print the shape of each feature map
+print(f"Received {len(feature_maps)} feature maps.")
 for i, feat_map in enumerate(feature_maps):
-    print(f"Feature map {i+1} shape: {feat_map.shape}")
+    if isinstance(feat_map, torch.Tensor):
+        print(f"Feature map {i+1} shape: {feat_map.shape}")
+    else:
+        print(f"Feature map {i+1} type: {type(feat_map)}")

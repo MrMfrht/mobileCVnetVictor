@@ -94,7 +94,7 @@ class MobileViTv2(BaseImageEncoder):
         # )
 
         # check model
-        self.check_model()
+        # self.check_model()
 
         # weight initialization
         self.reset_parameters(opts=opts)

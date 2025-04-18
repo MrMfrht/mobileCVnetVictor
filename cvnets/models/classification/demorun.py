@@ -13,9 +13,13 @@ setattr(opts, "model.classification.mitv2.ffn_dropout", 0.0)
 setattr(opts, "model.classification.mitv2.attn_norm_layer", "layer_norm_2d")
 setattr(opts, "common.enable_coreml_compatible_module", False)
 setattr(opts, "model.classification.enable_layer_wise_lr_decay", False)
+setattr(opts, "model.classification.layer_wise_lr_decay_rate", 0.9)
 
-# Add the second missing attribute with a default value
-setattr(opts, "model.classification.layer_wise_lr_decay_rate", 0.9) # <-- Add this line
+# Add the missing normalization attribute
+setattr(opts, "model.normalization.name", "batch_norm") # <-- Add this line (e.g., 'batch_norm')
+# You might also need related normalization options depending on the chosen type
+setattr(opts, "model.normalization.momentum", 0.1) # Example for batch_norm
+setattr(opts, "model.normalization.groups", 1) # Example for group_norm/instance_norm
 
 # 2. Instantiate the model
 model = MobileViTv2(opts=opts)
